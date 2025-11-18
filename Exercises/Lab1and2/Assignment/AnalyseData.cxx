@@ -73,51 +73,198 @@ std::vector<float> least_squares_fit(std::vector<cartesian_vector> &data){
     return {p, q};
 };
 
+float chi_square_test(std::vector<cartesian_vector> &data, std::vector<std::pair<float,float>> &errors, std::vector<float> &fit_params){
+    float chi_square = 0.0;
+    int N = data.size();
+    float p = fit_params[0];
+    float q = fit_params[1];
+    for(int i=0; i<N; i++){
+        float y = data[i].get_y();
+        float y_fit = p * data[i].get_x() + q;
+        float error = errors[i].second; // Assuming errors vector holds (error_in_x, error_in_y)
+        chi_square += std::pow((y - y_fit) / error, 2);
+    };
+    return chi_square;
 
+};
 
-int main() {
-    std::string inputFile = "input2D_float.txt";
-    std::ifstream data_file;
-    data_file.open(inputFile);
-    if (!data_file.is_open()) {
-        std::cerr << "Error opening file: " << inputFile << std::endl;
-        return -1;
-    }
-    else {
-        std::cout << "File opened successfully: " << inputFile <<"\n"<< std::endl;
+template<typename type> std::vector<type> process_file(std::string filename, int header_lines) {
+    // Function to process data files and store them in vectors of a certain type
+    std::ifstream file;
+    file.open(filename);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        exit(-1);       
+    } else {
+        std::cout << "File opened successfully: " << filename << std::endl;
     }    
-
-    std::vector<cartesian_vector> data;
     std::string line;
-    int header_lines = 1;
-    // Read and ignore header lines
+    // Skip header lines 
     for (int i = 0; i < header_lines; ++i) {
-        std::getline(data_file, line);
+        std::getline(file, line);
     }
-    // Read in desired data 
-    while (std::getline(data_file, line)) {
+
+    // Create vector to hold data of a certain type
+    std::vector<type> data;
+    // Read in data line by line
+    while (std::getline(file, line)) {
         // Store line as an input stream such that we can read x and y from it
         std::istringstream iss(line);
         // data is comma delimited
         std::string x_str, y_str;
-        std::getline(iss, x_str, ','); 
+        // Take up to first comma
+        std::getline(iss, x_str, ',');
+        // Take the rest of the line as y 
         std::getline(iss, y_str);
+        // Convert strings to floats
         float x = std::stof(x_str);
         float y = std::stof(y_str);
-        cartesian_vector vec(x, y);
-        data.push_back(vec)
-    ;
+        // Create an object to store x and y and add them to our vector
+        type vec(x, y);
+        data.push_back(vec);
     }
-    // Close file now we've extracted data
-    data_file.close();
+    // Close file now we've read in data
+    file.close();
+    // Return extracted data
+    return data;
+};
 
-    int N = 10;
-    print_N_lines(N, data);
-    std::vector<float> fit_params = least_squares_fit(data);
-    std::cout << "\nLeast squares fit parameters:\n";
-    std::cout << "p (slope): " << fit_params[0] << std::endl;
-    std::cout << "q (intercept): " << fit_params[1] << "\n" << std::endl;
+template<typename type> void produce_output_file(std::vector<type> output_data, std::string output_file_name, std::string file_header) {
+    std::ofstream output_file(output_file_name);
+    if (!output_file.is_open()) {
+        std::cout << "Unable to open file for writing: " << output_file_name << std::endl;
+        return;
+    } else {
+        // Header line
+        output_file << file_header << "\n";
+        // Insert data line by line
+        for (auto &output_line : output_data) {
+            output_file << output_line << "\n";
+        };
+        // Close file
+        output_file.close();
+        std::cout << "Output saved to " << output_file_name << std::endl;
+    }
+};
 
-    // Calculate x^y for the first point
-    std::cout << "x^y for the first point: " << data[2].power(data[2].get_x(),2) << std::endl;
-}
+bool length_check(int data_length, int num_lines){
+    if (num_lines > data_length){
+        return false;
+    } else {
+        return true;
+    }
+};
+
+int main() {
+    // Define desired file names
+    std::string inputFile = "input2D_float.txt";
+    std::string errorsFile = "error2D_float.txt";
+
+    // Process input data
+    std::vector<cartesian_vector> data;
+    data = process_file <cartesian_vector>(inputFile, 1);
+
+    // file size 
+    int file_size = data.size();
+    // Process error data
+    std::vector<std::pair<float,float>> error_data;
+    error_data = process_file <std::pair<float,float>>(errorsFile, 1);
+
+    // Ask user if they want to print data
+    std::cout << "Would you like to print the data? (y/n): ";
+    char print_choice;
+    std::cin >> print_choice;
+    switch (print_choice)
+    {
+    case 'y': {
+        std::cout << "How many lines would you like to print? ";
+        int num_lines;
+        std::cin >> num_lines;
+        bool valid_input = length_check(file_size, num_lines);
+        if (valid_input == true){
+            print_N_lines(num_lines, data);
+        } else {
+            std::cout << "Invalid input. Printing first 5 lines by default." << std::endl;
+            print_N_lines(5, data);
+        };
+        break;
+    }
+    case 'n': {
+        break;
+    }
+    }
+
+    // Ask user if they want to determine the maginitude of the vectors
+    std::cout << "Would you like to calculate the magnitude of the vectors? (y/n): ";
+    char magnitude_choice;
+    std::cin >> magnitude_choice;
+    switch (magnitude_choice)
+    {
+    case 'y': {
+        std::cout << "How many lines would you like to calculate the magnitude for? (There are " << file_size << " lines in the file): ";
+        int num_lines;
+        std::cin >> num_lines;
+        bool valid_input = length_check(file_size, num_lines);
+        // Initialise magnitudes vector
+        std::vector<float> magnitudes;
+        if (valid_input == true){
+            for (int i=0; i < num_lines; i++){
+                magnitudes.push_back(data[i].magnitude());
+                std::cout << "Magnitude of vector " << i << ": " << magnitudes[i] << std::endl;
+            };
+        } else {
+            std::cout << "Invalid input. Calculating magnitude for first 5 lines by default." << std::endl;
+            for (int i=0; i < 5; i++){
+                magnitudes.push_back(data[i].magnitude());
+                std::cout << "Magnitude of vector " << i << ": " << magnitudes[i] << std::endl;
+            };
+        };
+        produce_output_file<float>(magnitudes, "vector_magnitudes.txt", "Magnitudes of each point:");
+        break;  
+    }
+    }
+
+    // Ask user if they want to perform least squares fit
+    std::cout << "Would you like to perform a least squares fit of the data? (y/n): ";
+    char fit_choice;
+    std::cin >> fit_choice;
+    switch (fit_choice)
+    {   
+    case 'y': {
+        std::vector<float> fit_params = least_squares_fit(data);
+        fit_params.push_back(chi_square_test(data, error_data, fit_params));
+        std::cout << "\nLeast squares fit parameters:\n";
+        std::cout << "p (slope): " << fit_params[0] << std::endl;
+        std::cout << "q (intercept): " << fit_params[1] << "" << std::endl;
+        std::cout << "Chi-square test result: " << fit_params[2] << "\n" << std::endl;
+        std::vector<std::string> fit_string = {"y = " + std::to_string(fit_params[0]) + " * x + " + std::to_string(fit_params[1]),"Chi Squared = " + std::to_string(fit_params[2])};
+        produce_output_file<std::string>(fit_string, "linear_fit_parameters.txt", "Least squares fit of the data:");
+        break;
+        }
+    case 'n': {
+        break;
+        }
+    }
+
+    // Ask user if they want to calculate x^y for the vectors
+    std::cout << "Would you like to calculate x^y for the data? (y/n): ";
+    char power_choice;
+    std::cin >> power_choice;
+    switch (power_choice)
+    {
+    case 'y': {
+        std::cout << "How many lines would you like to calculate x^y for? (There are " << file_size << " lines in the file): ";
+        int num_lines;
+        std::cin >> num_lines;
+        bool valid_input = length_check(file_size, num_lines);
+        // Initialise power results vector
+        std::vector<float> power_results;
+        for (int i; i < num_lines; i++) {
+            power_results.push_back(data[i].power(data[i].get_x(), 2));
+            std::cout << "x^y for point " << i << ": " << power_results[i] << std::endl;
+        }
+        produce_output_file<float>(power_results, "power_results.txt", "x^y results for each point:");
+        break;
+        }
+    }
+};

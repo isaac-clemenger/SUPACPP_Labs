@@ -1,0 +1,3 @@
+Least squares fit of the data:
+y = 0.126265 * x + 2.026280
+Chi Squared = 791243.687500
