@@ -1,14 +1,27 @@
+// Graduate C++ Course (SUPACOO) 2025
+// Assignment 1: Analuse a set of 2D data points stored in a text file
+// Isaac Clemenger 19/11/12025 
+// Main file to run analysis code
+
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
-#include <cmath>
 #include <sstream>
 
+// Include custom headers
+#include "CustomFunctions.h"
+#include "CartesianVector.h"
+
+/*
 class cartesian_vector {
+    private:
+    // x,y private members so they cannot be modified outside the class
+    float x;
+    float y;
     public:
-        float x;
-        float y;
+    // Default constructor just creates a null vector
+    cartesian_vector() : x(0.0), y(0.0) {}
     // Constructor
     cartesian_vector(float x_val, float y_val) : x(x_val), y(y_val) {}
 
@@ -27,6 +40,7 @@ class cartesian_vector {
     float power(float result, int index) const {
         // Calculate x^y by recursion
         int exponent = static_cast<int>(std::round(y));
+        // Check edge case of 0 exponent
         if (exponent == 0) {
             return 1.0;
         }
@@ -154,6 +168,7 @@ bool length_check(int data_length, int num_lines){
         return true;
     }
 };
+*/
 
 int main() {
     // Define desired file names
@@ -210,13 +225,13 @@ int main() {
         if (valid_input == true){
             for (int i=0; i < num_lines; i++){
                 magnitudes.push_back(data[i].magnitude());
-                std::cout << "Magnitude of vector " << i << ": " << magnitudes[i] << std::endl;
+                std::cout << "Magnitude of vector " << i+1 << ": " << magnitudes[i] << std::endl;
             };
         } else {
             std::cout << "Invalid input. Calculating magnitude for first 5 lines by default." << std::endl;
             for (int i=0; i < 5; i++){
                 magnitudes.push_back(data[i].magnitude());
-                std::cout << "Magnitude of vector " << i << ": " << magnitudes[i] << std::endl;
+                std::cout << "Magnitude of vector " << i+1 << ": " << magnitudes[i] << std::endl;
             };
         };
         produce_output_file<float>(magnitudes, "vector_magnitudes.txt", "Magnitudes of each point:");
@@ -259,12 +274,23 @@ int main() {
         bool valid_input = length_check(file_size, num_lines);
         // Initialise power results vector
         std::vector<float> power_results;
-        for (int i; i < num_lines; i++) {
-            power_results.push_back(data[i].power(data[i].get_x(), 2));
-            std::cout << "x^y for point " << i << ": " << power_results[i] << std::endl;
-        }
+        if (valid_input == true){
+            for (int i; i < num_lines; i++) {
+                power_results.push_back(data[i].power(data[i].get_x(), 2));
+                std::cout << "x^y for point " << i+1 << ": " << power_results[i] << std::endl;
+            }
+        } else {
+            std::cout << "Invalid input. Calculating x^y for first 5 lines by default." << std::endl;
+            for (int i; i < 5; i++) {
+                power_results.push_back(data[i].power(data[i].get_x(), 2));
+                std::cout << "x^y for point " << i+1 << ": " << power_results[i] << std::endl;
+            }
+        };
         produce_output_file<float>(power_results, "power_results.txt", "x^y results for each point:");
         break;
-        }
+    }
+    case 'n': {
+        break;  
+    }
     }
 };
