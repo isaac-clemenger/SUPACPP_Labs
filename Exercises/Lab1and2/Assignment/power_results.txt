@@ -6,4 +6,3 @@ x^y results for each point:
 0.182998
 580.264
 5.38096
-2.8819

@@ -75,5 +75,10 @@ template<typename type> void produce_output_file(std::vector<type> output_data, 
         std::cout << "Output saved to " << output_file_name << std::endl;
     }
 };
+
 bool length_check(int data_length, int num_lines);
+
+int integer_check();
+
+char correct_character_check(char char1, char char2);
 

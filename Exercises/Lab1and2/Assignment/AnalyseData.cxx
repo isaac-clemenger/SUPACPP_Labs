@@ -30,14 +30,13 @@ int main() {
 
     // Ask user if they want to print data
     std::cout << "Would you like to print the data? (y/n): ";
-    char print_choice;
-    std::cin >> print_choice;
+    // Validate input
+    char print_choice = correct_character_check('y', 'n');
     switch (print_choice)
     {
     case 'y': {
         std::cout << "How many lines would you like to print? ";
-        int num_lines;
-        std::cin >> num_lines;
+        int num_lines = integer_check();
         bool valid_input = length_check(file_size, num_lines);
         if (valid_input == true){
             print_N_lines(num_lines, data);
@@ -54,14 +53,13 @@ int main() {
 
     // Ask user if they want to determine the maginitude of the vectors
     std::cout << "Would you like to calculate the magnitude of the vectors? (y/n): ";
-    char magnitude_choice;
-    std::cin >> magnitude_choice;
+    // Validate input
+    char magnitude_choice = correct_character_check('y', 'n');
     switch (magnitude_choice)
     {
     case 'y': {
         std::cout << "How many lines would you like to calculate the magnitude for? (There are " << file_size << " lines in the file): ";
-        int num_lines;
-        std::cin >> num_lines;
+        int num_lines = integer_check();
         bool valid_input = length_check(file_size, num_lines);
         // Initialise magnitudes vector
         std::vector<float> magnitudes;
@@ -84,8 +82,7 @@ int main() {
 
     // Ask user if they want to perform least squares fit
     std::cout << "Would you like to perform a least squares fit of the data? (y/n): ";
-    char fit_choice;
-    std::cin >> fit_choice;
+    char fit_choice = correct_character_check('y', 'n');
     switch (fit_choice)
     {   
     case 'y': {
@@ -106,14 +103,12 @@ int main() {
 
     // Ask user if they want to calculate x^y for the vectors
     std::cout << "Would you like to calculate x^y for the data? (y/n): ";
-    char power_choice;
-    std::cin >> power_choice;
+    char power_choice = correct_character_check('y', 'n');
     switch (power_choice)
     {
     case 'y': {
         std::cout << "How many lines would you like to calculate x^y for? (There are " << file_size << " lines in the file): ";
-        int num_lines;
-        std::cin >> num_lines;
+        int num_lines = integer_check();
         bool valid_input = length_check(file_size, num_lines);
         // Initialise power results vector
         std::vector<float> power_results;

@@ -51,10 +51,67 @@ float chi_square_test(std::vector<cartesian_vector> &data, std::vector<std::pair
 
 };
 
-bool length_check(int data_length, int num_lines) {
+bool length_check(int data_length, int num_lines){
     if (num_lines > data_length){
         return false;
     } else {
         return true;
     }
 };
+
+int integer_check(){
+    std::string input;
+    // Take input in using getline to capture whole input and not leave anything in the input buffer
+    std::getline(std::cin, input);
+    // Uses a try catch block wrapped in a while loop to force user into inputting an integer
+    while(true)
+    {
+        try
+        {
+            // Try to convert input to an integer, can't just try to cast as stoi goes element by element, so will assign partial values
+            // Define value to hold converted integer
+            int value;
+            std::istringstream input_stream(input);
+            // Try to extract integer from input stream
+            input_stream >> value;
+            // First check if that failed, i.e no integer could be extracted
+            if (input_stream.fail()) throw std::invalid_argument("Input is not an integer");
+            // Now check if there are any remaining characters in the stream by casting to a char, if so then input was not a valid integer
+            char remaining;
+            if (input_stream >> remaining) throw std::invalid_argument("Input is not a valid integer");
+            // If we reach here then input is valid, so return the integer value
+            return value;
+        } 
+        catch (...) 
+        {
+            std::cout<<"Please enter an integer: \n";
+            std::getline(std::cin, input);
+        }
+    }
+}
+
+char correct_character_check(char char1, char char2)
+  {  
+    std::string input;
+    // Take input in using getline to capture whole input and not leave anything in the input buffer
+    std::getline(std::cin, input);
+    // Uses a try catch block wrapped in a while loop to force user into inputting a correct character
+    while(true)
+    {
+      try
+      {
+        // Check if they haven't input a single character as requested
+        if (input.length() != 1) throw input;
+        // now know it's a single character, so we can extract it
+        char character;
+        character = input[0];
+        // Check if the input is a character we want
+        if (character == char1 || character == char2) return character; else throw character;
+      } 
+      catch (...) 
+      {
+        std::cout<<"Please enter a character that is a "<<char1<<" or "<<char2<<": \n";
+        std::getline(std::cin, input);
+      }
+    }
+  }

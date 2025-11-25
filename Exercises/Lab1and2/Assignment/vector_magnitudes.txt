@@ -4,4 +4,3 @@ Magnitudes of each point:
 5.8506
 2.63304
 0.671568
-6.39592
