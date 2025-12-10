@@ -27,15 +27,35 @@ int main() {
     data = Extract_data(file_path);
 
     // create a finite function with range -10,10, plot it and the data
-    CrystalBall function(-10,10,"MyCrystalBall2",-2,0.9,1.5,3);
-    function.plotFunction();
-    function.printInfo();
-    function.plotData(data, 100, true);
+    FiniteFunction invXsq(-10,10,"MyInvXsq");
+    invXsq.plotFunction();
+    invXsq.printInfo();
+    invXsq.plotData(data, 100, true);
 
+    // repeat for normal distribution
+    Normal NormalDist(-10,10,"MyNormal",-2,0.8);
+    NormalDist.plotFunction();
+    NormalDist.printInfo();
+    NormalDist.plotData(data, 100, true);
+
+    // repeat for Cauchy-Lorentz distribution
+    CauchyLorentz CauchyLorentzDist(-10,10,"MyCauchyLorentz",0.8,-2);
+    CauchyLorentzDist.plotFunction();
+    CauchyLorentzDist.printInfo();
+    CauchyLorentzDist.plotData(data, 100, true);
+
+    // Finally for Crystal ball
+    CrystalBall CrystalBallDist(-10,10,"MyCrystalBall",-2,0.9,1.5,3);
+    CrystalBallDist.plotFunction();
+    CrystalBallDist.printInfo();
+    CrystalBallDist.plotData(data, 100, true);
+
+    /*
     std::vector<double> sampled_data;
     Normal sample_function(-10,10,"SampleFunction",-2,0.8);
     sampled_data = function.Metropolis_algorithm(sample_function, 10000, 0.4);
     function.plotData(sampled_data,100,false);
+    */
 };
 
 
