@@ -31,31 +31,37 @@ int main() {
     invXsq.plotFunction();
     invXsq.printInfo();
     invXsq.plotData(data, 100, true);
+    // Metropolis sample of the data
+    std::vector<double> sampled_invXsq = invXsq.Metropolis_algorithm(invXsq, 10000, 0.4);
+    invXsq.plotData(sampled_invXsq,100,false);
 
-    // repeat for normal distribution
-    Normal NormalDist(-10,10,"MyNormal",-2,0.8);
+    // repeat for normal distribution (this is what data is generated from)
+    Normal NormalDist(-10,10,"MyNormal",-2,1);
     NormalDist.plotFunction();
     NormalDist.printInfo();
     NormalDist.plotData(data, 100, true);
+    // Metropolis sample of the data
+    std::vector<double> sampled_normal = NormalDist.Metropolis_algorithm(NormalDist, 10000, 0.4);
+    NormalDist.plotData(sampled_normal,100,false);
 
     // repeat for Cauchy-Lorentz distribution
     CauchyLorentz CauchyLorentzDist(-10,10,"MyCauchyLorentz",0.8,-2);
     CauchyLorentzDist.plotFunction();
     CauchyLorentzDist.printInfo();
     CauchyLorentzDist.plotData(data, 100, true);
+    // Metropolis sample of the data
+    std::vector<double> sampled_CauchyLorentz = CauchyLorentzDist.Metropolis_algorithm(CauchyLorentzDist, 10000, 0.4);
+    CauchyLorentzDist.plotData(sampled_CauchyLorentz,100,false);
 
     // Finally for Crystal ball
     CrystalBall CrystalBallDist(-10,10,"MyCrystalBall",-2,0.9,1.5,3);
     CrystalBallDist.plotFunction();
     CrystalBallDist.printInfo();
     CrystalBallDist.plotData(data, 100, true);
+    // Metropolis sample of the data
+    std::vector<double> sampled_CrystalBall = CrystalBallDist.Metropolis_algorithm(CrystalBallDist, 10000, 0.4);
+    CrystalBallDist.plotData(sampled_CrystalBall,100,false);
 
-    /*
-    std::vector<double> sampled_data;
-    Normal sample_function(-10,10,"SampleFunction",-2,0.8);
-    sampled_data = function.Metropolis_algorithm(sample_function, 10000, 0.4);
-    function.plotData(sampled_data,100,false);
-    */
 };
 
 
