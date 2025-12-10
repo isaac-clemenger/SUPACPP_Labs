@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include "gnuplot-iostream.h"
+#include <random>
 
 #pragma once //Replacement for IFNDEF
 
@@ -23,6 +24,48 @@ public:
   void plotData(std::vector<double> &points, int NBins, bool isdata=true); //NB! use isdata flag to pick between data and sampled distributions
   virtual void printInfo(); //Dump parameter info about the current function (Overridable)
   virtual double callFunction(double x); //Call the function with value x (Overridable)
+
+  // Define entire metropolis algorithm here as it is a template function such that it can be used for each of the three distributions
+  template<typename type> std::vector<double> Metropolis_algorithm(type sample_function, int Num_points, double sigma){
+        // define vector to store data
+    std::vector<double> data;
+    // initialise random numbers
+    unsigned int seed = 67; //unsigned to allow wide range of seeds
+    // Define the function we use to generate pseudo random numbers using the input seed
+    std::mt19937 mtEngine{seed};
+    // Create uniform distribution defined over a given range
+    std::uniform_real_distribution<double> uniform_pdf{m_RMin, m_RMax};
+    // use the random number generator we defined to draw a number from the uniform distribtuion
+    double x  = uniform_pdf(mtEngine);
+    // initialise this as the first point in our distribution
+    data.push_back(x);
+    
+    // using a for loop generate as many points as requested
+    for (int i = 0; i < Num_points; i++){
+        // generate y from normal distribution centered on x, with arbitrary standard deviation
+        std::normal_distribution<double> normal_pdf{data[i],sigma};
+        double y = normal_pdf(mtEngine);
+        
+        // compute f(y), f(x_i)
+        double f_y = sample_function.callFunction(y);
+        double f_x = sample_function.callFunction(data[i]);
+
+        // Metropolis step, find the minimum of this quotient and 1
+        double A = std::min(f_y/f_x, 1.0);
+
+        // Accept / reject step
+        // first need a distribution from 0 to 1
+        std::uniform_real_distribution<double> uniform_pdf_0_to_1{0,1.0};
+        double T = uniform_pdf_0_to_1(mtEngine);
+        // Accept or reject
+        if (T < A) {
+            data.push_back(y);
+        } else {
+            data.push_back(data[i]);
+        }
+    }
+    return data;
+  }
 
   //Protected members can be accessed by child classes but not users
 protected:

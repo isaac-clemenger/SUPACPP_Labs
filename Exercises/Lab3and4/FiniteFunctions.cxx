@@ -62,8 +62,24 @@ Integration by hand (output needed to normalise function when plotting)
 ###################
 */ 
 double FiniteFunction::integrate(int Ndiv){ //private
-  //ToDo write an integrator
-  return -99;  
+  // Simple integrator using left Riemann sum
+  // Need to know the change in x between points, this will be a constant
+  double range = m_RMax - m_RMin;
+  double delta_x = range / Ndiv;
+  // initialise x and y positions for integration
+  double x = m_RMin;
+  double y;
+  double integral = 0;
+  // increment through, adding delta_x to x until we reach the maximum x position our function is defined for
+  while(x<m_RMax){
+    // determine y
+    y = callFunction(x);
+    // calculate integral
+    integral += y * delta_x;
+    // increment x
+    x += delta_x;
+  }
+  return integral;  
 }
 double FiniteFunction::integral(int Ndiv) { //public
   if (Ndiv <= 0){
